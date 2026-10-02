@@ -1,0 +1,29 @@
+---
+description: Supabase security and platform practices for this Next.js and Prisma application
+globs: "**/*.{ts,tsx,sql,prisma}"
+alwaysApply: false
+---
+
+# Supabase Best Practices
+
+## Project Boundaries
+
+- Keep Supabase integrations in focused server-side services. Follow the established Next.js App Router and authentication design; do not introduce Supabase Auth or a client state library unless the feature requires it.
+- Prisma migrations own the application's tables, constraints, and RLS policies. Keep platform-specific setup, such as private Storage bucket creation, in documented Supabase SQL setup scripts.
+- Check current Supabase documentation and changelog before implementing or changing a Supabase feature, CLI workflow, or security configuration.
+
+## Security and Data Access
+
+- Enable RLS on tables in exposed schemas and write policies for the actual user/resource ownership model. Authentication alone is not authorization; do not use blanket access policies.
+- Never use user-editable `user_metadata` for authorization. Keep service-role or secret keys in server-only code; browser code may use only publishable keys.
+- Validate and authorize every request on the server. Use parameterized queries; never build SQL by interpolating untrusted input.
+- Keep private files in private buckets. Check the requesting user's right to the resource before returning a short-lived signed URL or handling a download.
+- Handle Supabase response errors explicitly and return user-safe messages. Log useful server-side context without secrets or sensitive user data.
+- Use Realtime only for features that require live updates. Keep subscriptions bounded and clean them up when their owner is disposed.
+
+## Workflow and Verification
+
+- Make schema changes through versioned migrations, review the SQL, and test against local Postgres before deployment. Do not make untracked production Dashboard edits.
+- Keep local, staging, and production environments separate. Store credentials outside version control and limit production access.
+- Test authorization boundaries, RLS behavior, and Storage access with the local database or Supabase test project. Use manual checks against deployed Supabase for the end-to-end flow.
+- Monitor query plans and add indexes for measured access patterns. Use bounded queries and pagination for large result sets; configure backups and review platform health and security advisories.

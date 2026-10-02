@@ -1,0 +1,20 @@
+---
+description: Data fetching, performance, error handling, and test conventions
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Data and Performance
+
+- Fetch data directly in async Server Components. Do not use `useEffect` or client-side fetches for internal APIs.
+- Deduplicate identical fetches with `React.cache()`. Use `unstable_cache()` for long-lived cached data and `unstable_noStore()` for data that must always be fresh.
+- Run independent requests in parallel with `Promise.all()`.
+- Use `next/image` for raster images and set `sizes` to match the rendered layout. Use `next/font` with `display: 'swap'`; use CSS variables when integrating with Tailwind.
+- Lazy-load Client Components with `dynamic()` and a meaningful loading fallback. Set route cache policies with `revalidate`; use `dynamic = 'force-static'` for pages without dynamic data.
+
+# Errors and Tests
+
+- Add `error.tsx` to route segments that can fail. Accept `error: Error` and `reset: () => void`, and log errors to the configured external service before showing the fallback.
+- Add `not-found.tsx` for 404 states and call `notFound()` from `next/navigation` when appropriate.
+- Test Server Components with Vitest by awaiting the component function. Test Client Components with React Testing Library and mock `next/navigation` hooks with `vi.mock`.
+- Cover critical user flows with Playwright, including authentication and form submission. Test Server Actions directly for results and side effects.

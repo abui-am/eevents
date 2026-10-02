@@ -1,0 +1,15 @@
+---
+description: Tailwind CSS and shadcn/ui integration practices for Next.js App Router components
+globs: "**/*.{tsx,css}"
+alwaysApply: false
+---
+
+# Tailwind CSS with shadcn/ui
+
+- Use shadcn/ui when it is part of the selected project stack. It provides accessible component source code to add and customize in the application; it is not imported from an `@shadcn/ui` runtime package.
+- Follow the current shadcn/ui setup for the project's framework and Tailwind version. Initialize with `npx shadcn@latest init`, then add components with `npx shadcn@latest add <component>`; import generated components from the configured local alias, such as `@/components/ui/button`.
+- Match Tailwind setup to the installed major version and current Next.js App Router instructions. Do not assume a `tailwind.config.js` is required: Tailwind v4 uses CSS-first configuration and automatic source detection in common setups, while v3 uses a JavaScript config and content globs.
+- Build pages from shadcn/ui components and customize them with Tailwind utilities and project theme tokens. Keep component APIs reusable and readable.
+- Use responsive utilities and test narrow and wide layouts. Preserve accessible names, keyboard interaction, focus indicators, and semantic HTML when composing or customizing components.
+- Keep bundles lean by adding only needed components and loading expensive interactive components on demand. Let Tailwind's build scan application sources; add external sources explicitly only when the installed version and dependency require it.
+- Do not use Pages Router data functions in App Router pages. Fetch on the server when possible, and provide meaningful loading and error UI for asynchronous or interactive features.

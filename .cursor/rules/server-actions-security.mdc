@@ -1,0 +1,17 @@
+---
+description: Validation, authorization, and mutation rules for Next.js server code
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Server Actions and Security
+
+- Handle mutations with Server Actions declared using `'use server'` in a server-only file or inline in a Server Component.
+- Validate every action input with Zod before processing. Return structured field errors for invalid input.
+- Return typed results such as `{ success: true, data: T } | { success: false, error: string }`; do not throw from Server Actions.
+- Check the authenticated session and resource ownership on the server for every protected mutation. Never rely on client-side authorization.
+- Validate and sanitize data in Server Actions and Route Handlers. Revalidate the affected path or tag after a successful mutation.
+- Use Server Actions as form `action` handlers; use React 19 `useActionState` when pending and result state is needed.
+- Prefix an environment variable with `NEXT_PUBLIC_` only when its value is safe to expose in the browser.
+- Configure Content Security Policy headers in `next.config.ts` using `headers()`.
+- Keep service credentials in server code only. Preserve database row-level security and private storage access controls.

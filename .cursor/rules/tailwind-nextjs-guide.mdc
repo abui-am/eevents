@@ -1,0 +1,26 @@
+---
+description: Component planning and implementation guidance for Tailwind CSS in Next.js
+globs: "**/*.{tsx,css}"
+alwaysApply: false
+---
+
+# Tailwind CSS and Next.js Component Guide
+
+When planning or building a component, first clarify its purpose, states, and data needs. Include these details in implementation plans or generated component prompts:
+
+- Recommend relevant DaisyUI components when DaisyUI is part of the selected project stack; name the Tailwind utility classes and responsive breakpoints for custom styling.
+- Define required TypeScript props and data types. Prefer reusable, modular components with clear separation between presentation, business logic, and side effects.
+- Identify suitable Next.js features, data fetching or API integrations, and any required state or hooks. Keep server rendering as the default and add client behavior only for interactivity or browser APIs.
+- Specify loading, empty, and error states; accessibility requirements; keyboard behavior; and any icons or image assets.
+- Describe needed transitions or animations, performance considerations, meaningful tests, and component documentation.
+- Consider localization, SEO for user-facing pages, and current browser and device support where they apply.
+
+# Implementation Standards
+
+- Use Tailwind utility classes for styling where Tailwind is enabled. Avoid custom CSS unless utilities or component theming cannot express the design. Keep utility ordering consistent and use responsive variants for adaptive layouts.
+- Use DaisyUI as a component starting point when it is installed and selected for the project. Customize only where the design requires it, and use the project's design tokens.
+- Keep TypeScript strict, avoid `any`, explicitly type public inputs and outputs, and use runtime checks for untrusted values. Use discriminated unions for state with distinct variants; document complex types with JSDoc.
+- Follow the Next.js App Router: use Server Components for data-driven UI, validate and sanitize route parameters on the server, and use bracketed route segments such as `[id]` for dynamic routes.
+- Use `next/image` for raster images and set appropriate `sizes` and `priority` values for the rendered layout. Use App Router server rendering and route revalidation for dynamic and regenerating pages; do not use Pages Router data functions such as `getServerSideProps` in App Router routes.
+- Use Biome's recommended formatter and lint rules when Biome is configured. Keep checks in CI and, when the project has a pre-commit hook, run Biome against staged files.
+- Review changes through focused PRs with clear context and screenshots for visible UI changes. Prefer meaningful unit, integration, and end-to-end tests over coverage targets. Use Conventional Commit subjects when creating commits.

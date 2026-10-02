@@ -1,0 +1,36 @@
+---
+description: Prisma ORM and PostgreSQL practices for this Next.js application
+globs: "**/*.{ts,tsx,prisma,sql}"
+alwaysApply: false
+---
+
+# Prisma ORM Guidelines
+
+## TypeScript and Module Design
+
+- Write code and documentation in English. Keep TypeScript strict, avoid `any`, validate untrusted values at boundaries, and use descriptive domain types.
+- Use clear module boundaries for database access and business logic. Put complex reusable queries behind focused service or repository functions; avoid a repository abstraction for trivial one-off queries.
+- Keep Prisma Client server-only and reuse the project's server-side client instance. Never expose the raw client or privileged database credentials to browser code.
+- Keep functions focused and intention-revealing. Use explicit public types and document non-obvious public APIs; allow TypeScript to infer straightforward local values.
+
+## Schema and Migrations
+
+- Use domain-driven model and field names, explicit relations, appropriate native types, primary keys, unique constraints, and indexes that support actual query patterns.
+- Model lifecycle states and retention according to the accepted product decisions. Do not add blanket soft deletion or `deletedAt` fields without a concrete requirement.
+- Put application schema, constraints, and RLS policies in Prisma migrations. Keep Supabase-managed schemas such as `auth` and `storage` out of Prisma-managed migrations; document platform setup separately.
+- Create descriptive migrations, review their SQL, and test them against local Postgres. Never edit a migration after it has been applied or shared; create a follow-up migration for later changes.
+- Do not assume every migration is idempotent. Treat each as an ordered schema transition and use the project's migration workflow in development, CI, and deployment.
+
+## Queries, Transactions, and Errors
+
+- Use type-safe Prisma Client queries. Select only needed fields, bound result sizes, paginate large lists, and avoid N+1 query patterns.
+- Use transactions for multi-step mutations that must succeed or fail together. Put race-sensitive invariants in database constraints or transactions, not only in application pre-checks.
+- Use parameterized Prisma raw queries only when the generated API cannot express the operation; never concatenate untrusted values into SQL.
+- Handle expected Prisma errors, such as known request errors, at the service or action boundary. Return safe messages to users and log diagnostic details server-side without exposing query data or secrets.
+- Use Prisma extensions or other cross-cutting hooks only when a real shared concern requires them; keep business rules explicit in services.
+
+## Testing and Operations
+
+- Use a separate local PostgreSQL database for integration tests; an in-memory substitute does not verify PostgreSQL behavior. Mock Prisma only for isolated unit tests.
+- Cover successful operations, authorization failures, constraint violations, and edge cases. Use stable factories for test data and clean up test records.
+- Profile slow queries before optimizing. Add or change indexes based on query patterns and measured plans.

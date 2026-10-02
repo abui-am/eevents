@@ -1,0 +1,22 @@
+---
+description: Next.js 15 App Router, React Server Component, and TypeScript conventions
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Next.js and TypeScript Architecture
+
+- Build with Next.js 15 App Router and TypeScript. Keep `strict: true`; never use `any`, and narrow `unknown` with type guards.
+- Default components to React Server Components. Add `'use client'` only for event handlers, React hooks, or browser APIs. Never import Prisma, database clients, or other server-only modules into Client Components.
+- Compose Server and Client Components by passing server-rendered content as `children` to a Client Component wrapper. Use `React.Suspense` with meaningful loading skeletons for streamed sections.
+- Use `app/` for routes and route groups `(group)/` for shared layouts without URL segments. Co-locate route `page.tsx`, `layout.tsx`, `template.tsx`, `loading.tsx`, `error.tsx`, and `not-found.tsx` as needed.
+- Use `template.tsx` when navigation needs fresh state, parallel routes (`@slot`) for independently loaded sections, and intercepting routes (`(.)`, `(..)`) for modal routes that retain the background URL.
+- Use named exports for components and utilities. Default exports are reserved for `page.tsx`, `layout.tsx`, `error.tsx`, `loading.tsx`, and `not-found.tsx`.
+- Use `interface` for object shapes and component props; use `type` for unions, mapped types, and conditional types. Name boolean state descriptively, such as `isLoading`, `hasError`, and `canSubmit`.
+- Organize component files as exported component, subcomponents, helpers, types, then constants.
+
+# Routing
+
+- Use `next/link` for internal navigation. Use `router.push()` only for programmatic navigation.
+- In Client Components, use `useSearchParams`, `usePathname`, and `useParams` from `next/navigation`; read route values from page props on the server.
+- Use `[param]` for a single dynamic segment and `[...params]` for catch-all segments. Set `prefetch={false}` for links users are unlikely to follow.
