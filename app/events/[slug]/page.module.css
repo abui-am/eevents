@@ -1,0 +1,260 @@
+.page {
+  width: min(calc(100% - 32px), 1120px);
+  min-width: 0;
+  margin: 0 auto;
+  padding: var(--space-12) 0 var(--space-16);
+}
+
+.layout {
+  display: block;
+  min-width: 0;
+}
+
+.mainColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.heading {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.17;
+  text-wrap: pretty;
+}
+
+.schedule {
+  margin: 0;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.updated {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.section {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.section h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+.section p,
+.hostCopy p,
+.placeLines p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.hostList,
+.placeLines {
+  display: grid;
+  gap: var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.placeLines {
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+}
+
+.host {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 auto;
+  object-fit: cover;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-muted);
+}
+
+.hostCopy {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.hostCopy h3 {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+
+.hostCopy p,
+.descriptionCopy {
+  color: var(--color-text-secondary);
+}
+
+.descriptionCopy {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 65ch;
+}
+
+.descriptionCopy p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.mapLink,
+.mailLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.mapLink svg,
+.mailLink svg {
+  flex: none;
+}
+
+.panel {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface);
+}
+
+.panel h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.panel :global(.registration-help),
+.panel :global(.registration-state),
+.panel :global(.availability),
+.closingAction :global(.registration-help),
+.closingAction :global(.registration-state) {
+  margin: 0;
+}
+
+.panel :global(.button),
+.closingAction :global(.button) {
+  width: 100%;
+}
+
+.form {
+  margin: 0;
+}
+
+.columnAction {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .page {
+    width: min(calc(100% - 48px), 1120px);
+  }
+
+  .title {
+    font-size: 3rem;
+    line-height: 1.13;
+  }
+
+  .panel {
+    padding: var(--space-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .page {
+    width: min(calc(100% - 64px), 1120px);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    column-gap: var(--space-8);
+    align-items: start;
+  }
+
+  .mainColumn {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .columnAction {
+    display: grid;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    width: 320px;
+  }
+
+  .scheduleAction,
+  .closingAction {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .page {
+    width: calc(100% - 32px);
+    padding-top: var(--space-8);
+  }
+}
+
+.panel {
+  border-color: rgb(255 255 255 / 18%);
+  box-shadow: 0 8px 24px rgb(18 53 44 / 12%);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .panel {
+    background: rgb(32 34 35 / 72%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    backdrop-filter: blur(12px) saturate(140%);
+  }
+}
+
+@media (max-width: 767px) {
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .panel {
+      background: rgb(32 34 35 / 84%);
+      -webkit-backdrop-filter: blur(8px) saturate(140%);
+      backdrop-filter: blur(8px) saturate(140%);
+    }
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .panel {
+    background: var(--color-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
