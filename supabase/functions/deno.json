@@ -1,0 +1,14 @@
+{
+  "lock": "./deno.lock",
+  "imports": {
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.117.2"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true
+  },
+  "tasks": {
+    "check:ci": "deno fmt --check && deno check certificate-upload/index.ts && deno lint"
+  }
+}

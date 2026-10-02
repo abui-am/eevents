@@ -1,0 +1,2 @@
+[functions.certificate-upload]
+verify_jwt = false
