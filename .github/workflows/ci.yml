@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: eevents_test
+          POSTGRES_USER: eevents
+          POSTGRES_PASSWORD: eevents_test_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U eevents -d eevents_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://eevents:eevents_test_only@localhost:5432/eevents_test?schema=public
+      DIRECT_URL: postgresql://eevents:eevents_test_only@localhost:5432/eevents_test?schema=public
+      APP_ORIGIN: https://eevents-ci.example
+      CHECKIN_SIGNING_SECRET: ci-only-signing-secret-with-more-than-32-bytes
+      SUPABASE_URL: https://ci-project.supabase.co
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.17.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm db:generate
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - name: Check the Supabase Edge Function
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE/supabase/functions:/workspace" \
+            -w /workspace \
+            denoland/deno:alpine \
+            deno task check:ci
+      - run: pnpm build

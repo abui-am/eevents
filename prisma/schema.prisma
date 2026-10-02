@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  PARTICIPANT
+  ADMIN
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  CONFIRMED
+  ATTENDED
+  NO_SHOW
+  CANCELLED
+}
+
+enum CancellationActor {
+  PARTICIPANT
+  ADMIN
+}
+
+model User {
+  id               String         @id @default(cuid()) @db.Text
+  name             String         @db.VarChar(100)
+  email            String         @unique @db.VarChar(320)
+  passwordHash     String         @db.VarChar(60)
+  role             Role           @default(PARTICIPANT)
+  createdAt        DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime       @updatedAt @db.Timestamptz(3)
+  sessions         Session[]
+  organizedEvents  Event[]        @relation("EventOrganizer")
+  registrations    Registration[] @relation("RegistrationParticipant")
+  checkInsRecorded Registration[] @relation("RegistrationCheckedInBy")
+  endPresenceRecorded Registration[] @relation("RegistrationEndPresenceBy")
+}
+
+model Session {
+  id        String   @id @default(cuid()) @db.Text
+  userId    String   @db.Text
+  tokenHash String   @unique @db.Char(64)
+  expiresAt DateTime @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Event {
+  id            String         @id @default(cuid()) @db.Text
+  organizerId   String         @db.Text
+  title         String         @db.VarChar(160)
+  slug          String         @unique @db.VarChar(180)
+  description   String         @db.Text
+  location      String?        @db.VarChar(200)
+  coverKey      String?        @db.VarChar(300)
+  venueName     String?        @db.VarChar(160)
+  venueAddress  String?        @db.VarChar(300)
+  mapUrl        String?        @db.VarChar(1000)
+  startsAt      DateTime       @db.Timestamptz(3)
+  endsAt        DateTime       @db.Timestamptz(3)
+  capacity      Int
+  status        EventStatus    @default(DRAFT)
+  createdAt     DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime       @updatedAt @db.Timestamptz(3)
+  organizer     User           @relation("EventOrganizer", fields: [organizerId], references: [id], onDelete: Restrict)
+  registrations Registration[]
+  hosts         EventHost[]
+  questionnaireDraft QuestionnaireDraft?
+  questionnaireVersions QuestionnaireVersion[] @relation("EventQuestionnaireVersions")
+  currentQuestionnaireVersionId String? @db.Text
+  currentQuestionnaireVersion QuestionnaireVersion? @relation("CurrentQuestionnaire", fields: [currentQuestionnaireVersionId], references: [id], onDelete: SetNull)
+
+  @@index([organizerId])
+  @@index([status, startsAt])
+  @@index([currentQuestionnaireVersionId])
+}
+
+model EventHost {
+  id           String  @id @default(cuid()) @db.Text
+  eventId      String  @db.Text
+  name         String  @db.VarChar(100)
+  biography    String? @db.VarChar(500)
+  publicEmail  String? @db.VarChar(320)
+  avatarKey    String? @db.VarChar(300)
+  displayOrder Int
+  event        Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, displayOrder])
+}
+
+model Registration {
+  id                    String             @id @default(cuid()) @db.Text
+  userId                String             @db.Text
+  eventId               String             @db.Text
+  status                RegistrationStatus @default(REGISTERED)
+  cancelledBy           CancellationActor?
+  checkInTicketVersion  String?            @unique @db.Uuid
+  checkedInAt           DateTime?          @db.Timestamptz(3)
+  checkedInById         String?            @db.Text
+  endPresenceAt         DateTime?          @db.Timestamptz(3)
+  endPresenceById       String?            @db.Text
+  certificateKey        String?            @db.VarChar(300)
+  certificateUploadedAt DateTime?          @db.Timestamptz(3)
+  createdAt             DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime           @updatedAt @db.Timestamptz(3)
+  participant           User               @relation("RegistrationParticipant", fields: [userId], references: [id], onDelete: Restrict)
+  event                 Event              @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  checkedInBy           User?              @relation("RegistrationCheckedInBy", fields: [checkedInById], references: [id], onDelete: SetNull)
+  endPresenceBy         User?              @relation("RegistrationEndPresenceBy", fields: [endPresenceById], references: [id], onDelete: Restrict)
+  certificate           Certificate?
+  questionnaireVersionId String? @db.Text
+  questionnaireVersion QuestionnaireVersion? @relation(fields: [questionnaireVersionId], references: [id], onDelete: Restrict)
+  answers RegistrationAnswer[]
+
+  @@unique([userId, eventId])
+  @@index([eventId, status])
+  @@index([checkedInById])
+  @@index([endPresenceById])
+  @@index([questionnaireVersionId])
+}
+
+model Certificate {
+  id String @id @default(cuid()) @db.Text
+  registrationId String @unique @db.Text
+  token String @unique @db.VarChar(43)
+  html String @db.Text
+  templateVersion Int @default(1)
+  issuedAt DateTime @db.Timestamptz(3)
+  registration Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+}
+
+model QuestionnaireDraft {
+  eventId String @id @db.Text
+  revision Int @default(1)
+  questions Json @db.JsonB
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model QuestionnaireVersion {
+  id String @id @default(cuid()) @db.Text
+  eventId String @db.Text
+  number Int
+  questions Json @db.JsonB
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  event Event @relation("EventQuestionnaireVersions", fields: [eventId], references: [id], onDelete: Cascade)
+  currentFor Event[] @relation("CurrentQuestionnaire")
+  registrations Registration[]
+
+  @@unique([eventId, number])
+}
+
+model RegistrationAnswer {
+  id String @id @default(cuid()) @db.Text
+  registrationId String @db.Text
+  questionId String @db.Uuid
+  textValue String? @db.VarChar(2000)
+  booleanValue Boolean?
+  optionIds String[] @default([]) @db.Uuid
+  registration Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  @@unique([registrationId, questionId])
+  @@index([questionId])
+  @@index([optionIds], type: Gin)
+}

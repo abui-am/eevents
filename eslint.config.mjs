@@ -1,10 +1,10 @@
+import { FlatCompat } from "@eslint/eslintrc";
 import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+
+const compat = new FlatCompat({ baseDirectory: import.meta.dirname });
 
 const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
+  ...compat.config({ extends: ["next/core-web-vitals", "next/typescript"] }),
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "supabase/functions/**",
+    ".agents/**",
+    ".cursor/**",
   ]),
 ]);
 
